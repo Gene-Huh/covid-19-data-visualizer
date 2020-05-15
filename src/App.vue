@@ -2,16 +2,19 @@
   <div id="app">
     <h1>Covid-19 Data Visualizer</h1>
     <active-cases />
+    <active-u-sby-state />
   </div>
 </template>
 
 <script>
 import ActiveCases from "./components/ActiveCases.vue";
+import ActiveUSbyState from "./components/ActiveUSbyState.vue";
 
 export default {
   name: "App",
   components: {
-    ActiveCases
+    ActiveCases,
+    ActiveUSbyState
   }
 };
 </script>

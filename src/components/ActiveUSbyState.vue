@@ -1,5 +1,5 @@
 <template>
-  <line-chart v-if="loaded" :chartdata="chartdata" :options="options" />
+  <line-chart v-if="loaded" :chartdata="chartdata" :options="options" style="height: 1000px;"/>
 </template>
 
 <script>
@@ -10,7 +10,8 @@ export default {
   data: () => ({
     loaded: false,
     chartdata: null,
-    options: null
+    options: null,
+    labels: []
   }),
   methods: {
     convertDate(datetime) {
@@ -33,37 +34,59 @@ export default {
     },
     getRandomHex: function() {
       return "#" + Math.floor(Math.random() * 16777215).toString(16);
+    },
+    dateLabelMaker(data) {
+      for (let label of data) {
+        if (!this.labels.includes(label)) {
+          this.labels.push(label);
+        }
+      }
     }
   },
 
   async mounted() {
     this.loaded = false;
     try {
-      fetch("https://api.covid19api.com/live/country/korea-south")
+      fetch("https://api.covid19api.com/live/country/united-states")
         .then(response => response.json())
         .then(LiveData => {
           const filteredData = LiveData.map(ld => {
             return {
+              Province: ld.Province,
               Active: ld.Active,
               Date: ld.Date
             };
           });
+          this.dateLabelMaker(filteredData.map(fd => fd.Date));
+
+          let mergedObj = filteredData.reduce((acc, obj) => {
+              if (!acc[obj.Province]) {
+                acc[obj.Province] = [obj.Active];
+              } else {
+                acc[obj.Province].push(obj.Active);
+              }
+              return acc;
+            }, {});
+
+            let statesData = [];
+            for (let [key,value] of Object.entries(mergedObj)) {
+              statesData.push({
+                label: key,
+                data: value,
+                fill: false,
+                borderColor: this.getRandomHex()
+              })
+            };
+
 
           this.chartdata = {
-            labels: filteredData.map(fd => this.convertDate(fd.Date)),
-            datasets: [
-              {
-                label: LiveData[0].Country,
-                borderColor: this.getRandomHex(),
-                data: filteredData.map(fd => fd.Active),
-                fill: false
-              }
-            ]
+            labels: this.labels.map(label => this.convertDate(label)),
+            datasets: statesData
           };
           this.options = {
             title: {
               display: true,
-              text: "Active Cases by Day",
+              text: "(USA) Active Cases by Territory",
               fontSize: 20
             },
             responsive: true,
