@@ -15,7 +15,8 @@
     "node-sass": "^4.14.1",
     "vue": "^2.6.11",
     "vue-chart.js": "^0.2.0",
-    "vue-chartjs": "^3.5.0"
+    "vue-chartjs": "^3.5.0",
+    "websocket-extensions": "^0.1.4"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.3.0",
